@@ -1,0 +1,120 @@
+﻿'s wedding 에서 's 지워
+
+# 훈련 데이터
+train_data = [
+    ("The new Kiosk at the mall offers a variety of services.", {"entities": [(8, 12, "PRO")]}),
+    ("I used the Kiosk to print my boarding pass for the flight.", {"entities": [(11, 15, "PRO")]}),
+    ("The information Kiosk at the museum was very helpful.", {"entities": [(16, 20, "PRO")]}),
+    ("There was a long line at the Kiosk for concert tickets.", {"entities": [(29, 33, "PRO")]}),
+    ("She bought a coffee from the self-service Kiosk in the café.", {"entities": [(42, 46, "PRO")]}),
+    ("The airport has installed new Kiosks for easier check-in.", {"entities": [(30, 34, "PRO")]}),
+    ("The library Kiosk allows you to return books and pay fines.", {"entities": [(12, 16, "PRO")]}),
+    ("We stopped by the Kiosk to grab a quick snack.", {"entities": [(18, 22, "PRO")]}),
+    ("The hotel’s lobby features a digital Kiosk for guest services.", {"entities": [(37, 41, "PRO")]}),
+    ("The Kiosk in the parking lot provides parking information and maps.", {"entities": [(4, 8, "PRO")]}),
+    ("He used the Kiosk to check out his rental car.", {"entities": [(12, 16, "PRO")]}),
+    ("The train station’s Kiosk sells tickets and travel information.", {"entities": [(20, 24, "PRO")]}),
+    ("The new shopping center includes several interactive Kiosks.", {"entities": [(53, 57, "PRO")]}),
+    ("A Kiosk at the park offers rental bikes and gear.", {"entities": [(2, 6, "PRO")]}),
+    ("The hospital installed Kiosks to streamline patient check-in.", {"entities": [(23, 27, "PRO")]}),
+    ("I saw a Kiosk offering a discount on local tours.", {"entities": [(8, 12, "PRO")]}),
+    ("The museum’s Kiosk provides audio guides and exhibit details.", {"entities": [(13, 17, "PRO")]}),
+    ("The bus terminal has a Kiosk for purchasing travel passes.", {"entities": [(23, 27, "PRO")]}),
+    ("A Kiosk in the mall lets you browse and order custom merchandise.", {"entities": [(2, 6, "PRO")]}),
+    ("The Kiosk at the zoo allows you to purchase admission tickets.", {"entities": [(4, 8, "PRO")]}),
+    ("We found a Kiosk near the entrance that sold souvenirs.", {"entities": [(11, 15, "PRO")]}),
+    ("The Kiosk helped us quickly process the return.", {"entities": [(4, 8, "PRO")]}),
+    ("A new Kiosk in the lobby handles ticket sales.", {"entities": [(6, 10, "PRO")]}),
+    ("She used the Kiosk to check her account balance.", {"entities": [(13, 17, "PRO")]}),
+    ("The Kiosk at the train station is very convenient.", {"entities": [(4, 8, "PRO")]}),
+]
+
+
+
+
+
+# vstack, linalg를 이해하고 다시 해봄 9.24
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib notebook
+%matplotlib inline
+
+def descent_down_my_parabola(w_start,learning_rate,num_steps):
+    my_value = [w_start]
+    for _ in range(num_steps):
+        w_old = my_value[-1]
+        w_new = w_old - learning_rate*(np.array([4.,6.])*w_old)
+        my_value.append(w_new)
+    return np.array(my_value)
+
+my_parabola = descent_down_my_parabola((2.,4.),0.1,5)
+
+
+my_w1 = np.array([2,1.2,0.72,0.432,0.2592,0.15552])
+my_w2 = np.array([4, 1.6, 0.64, 0.256, 0.1024, 0.04096])
+
+L4 = [2*my_w1[i]**2 + 3*my_w2[i]**2 for i in range(6)]
+L4=np.array(L4)
+L4.reshape(-1,1)
+print(L4.shape)
+def my_mse(x,y,m,b):
+    m = np.atleast_1d(m)
+    b = np.atleast_1d(b)
+    return ((x*m[None] + b[None] - y) **2).mean(axis=1)
+
+my_A = np.vstack([my_w1, np.ones(len(my_w1))]).T
+m_opt4, b_opt4 = np.linalg.lstsq(my_A, my_w2, rcond=None)[0]
+l_opt4 = my_mse(my_w1, my_w2, m_opt4, b_opt4)
+
+center_m4 = m_opt4
+center_b4 = b_opt4
+
+
+# 그래프
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.plot([m_opt4],[b_opt4],l_opt4, c='black',marker='o',zorder=3,markersize=7)
+m4_series = np.linspace(center_m4-10, center_m4+10, 500)
+b4_series = np.linspace(center_b4-10, center_b4+10, 500).reshape(-1,1)
+Z4 = (b4_series + my_w1.reshape(-1,1,1) * m4_series) - my_w2.reshape(-1,1,1)
+Z4 = np.mean(Z4 ** 2, axis=0)
+
+
+※ 첨부 : 동아리 활동 관련 증빙 자료 (사진, 강의자료 및 학습자료 등) 함께 제출
+
+1주~마지막주 주차보고서, 수료증, 결과보고서, 기타 학습활동 증빙 자료(선택 제출), 만족도조사 및 사전수요조사(참여)
+
+# trajectory를 추가한 그래프
+
+m4_series, b4_series = np.meshgrid(m4_series, b4_series)
+ax.set_xlabel("w1")
+ax.set_ylabel("w2")
+ax.set_zlabel("mse")
+ax.ticklabel_format(style='sci', scilimits=(-1, 2))
+ax.view_init(elev=20, azim=30) 
+surf = ax.plot_surface(m4_series, b4_series, Z4, cmap=plt.get_cmap('GnBu'))
+trajectory = [2*my_w1[i]**2 + 3*my_w2[i]**2 for i in range(6)]
+trajectory = np.array(trajectory)
+trajectory = my_parabola
+# 지정한 trajectory를 그래프 위에 나타내기
+if trajectory is not None:
+    trajectories = np.atleast_2d(trajectory)
+    if trajectories.ndim == 2:
+        trajectories = trajectories[np.newaxis]
+    for trajectory in trajectories:
+        m_values, b_values = trajectory.T
+        l_values = ((my_w1*m_values[:, None]+b_values[:, None]-my_w2)**2).mean(axis=1)
+        ax.plot(
+            m_values,
+            b_values,
+            l_values,
+            marker="*",
+            zorder=3,
+            markersize=7,
+            )
+
+
+
+
+
+
